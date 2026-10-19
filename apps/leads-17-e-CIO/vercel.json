@@ -1,5 +1,12 @@
 {
   "rewrites": [
-    { "source": "/validar", "destination": "/index.html" }
+    {
+      "source": "/validar",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/leads",
+      "destination": "/index.html"
+    }
   ]
 }

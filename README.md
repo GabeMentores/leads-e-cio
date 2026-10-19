@@ -17,6 +17,14 @@ npm run estresse   # suíte de roteiros do chat
 Detalhes do app (variáveis de ambiente, rotas, export do comercial) em
 [apps/leads-17-e-CIO/README.md](apps/leads-17-e-CIO/README.md).
 
+## Links
+
+| Link | Quem usa |
+|---|---|
+| `https://leads-e-cio.vercel.app/` | participante (QR do estande) |
+| `https://leads-e-cio.vercel.app/validar#t=<LEADS_STAFF_TOKEN>` | staff do estande |
+| `https://leads-e-cio.vercel.app/leads#t=<LEADS_ADMIN_TOKEN>` | comercial — tabela + PDF |
+
 ## Vercel
 
 - **Root Directory:** `apps/leads-17-e-CIO`

@@ -3,12 +3,14 @@ import { createRoot } from 'react-dom/client';
 import './styles/globals.css';
 import { ChatScreen } from './ChatScreen';
 import { ValidarScreen } from './ValidarScreen';
+import { LeadsScreen } from './LeadsScreen';
 
 /** Dois links, dois públicos (regra do dono, 09-01): o QR do participante
  *  aponta para `/` (chat) e o pessoal do estande recebe um LINK SEPARADO —
  *  `/validar#t=CHAVE`. A chave viaja no FRAGMENTO de propósito: fragmento
  *  nunca chega ao servidor nem a log de acesso. O hash `#/validar` continua
- *  aceito como fallback. */
+ *  aceito como fallback. Um terceiro link, `/leads#t=CHAVE`, é a tabela do
+ *  comercial (chave = LEADS_ADMIN_TOKEN). */
 function App() {
   const [hash, setHash] = useState(window.location.hash);
   useEffect(() => {
@@ -18,6 +20,7 @@ function App() {
   }, []);
 
   const ehValidador = window.location.pathname.startsWith('/validar') || hash.startsWith('#/validar');
+  if (window.location.pathname.startsWith('/leads')) return <LeadsScreen />;
   return ehValidador ? <ValidarScreen /> : <ChatScreen />;
 }
 

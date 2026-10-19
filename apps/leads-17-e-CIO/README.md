@@ -16,6 +16,7 @@ Passo 1 aprovado em `docs/leads-chat-passo1-RASCUNHO.md` (raiz do repo).
 |---|---|---|
 | `/` | visitante (QR) | conversa com a bela → código da roleta |
 | `/validar#t=CHAVE` | staff do estande (link separado) | valida código e confirma o giro |
+| `/leads#t=CHAVE` | comercial (chave = `LEADS_ADMIN_TOKEN`) | tabela completa dos leads, ordenável, com exportação em PDF |
 
 São dois links distintos, um por público: o QR só aponta para `/`; o link do
 validador circula só entre o pessoal do estande. A chave viaja no *fragmento*
@@ -57,6 +58,7 @@ com o Supabase real, copie `.env.example` → `.env` e preencha.
    `SUPABASE_SERVICE_ROLE_KEY`, `LEADS_STAFF_TOKEN`, `LEADS_ADMIN_TOKEN`.
 4. QR do evento → `https://<app>.vercel.app/`
    · link do staff (separado) → `https://<app>.vercel.app/validar#t=<LEADS_STAFF_TOKEN>`
+   · tabela do comercial → `https://<app>.vercel.app/leads#t=<LEADS_ADMIN_TOKEN>`
 5. Export do comercial: painel do Supabase (Table Editor → export) ou
    `GET /api/leads?format=csv` com o header `X-Admin-Token`.
 
