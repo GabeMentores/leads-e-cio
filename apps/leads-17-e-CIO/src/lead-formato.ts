@@ -26,3 +26,15 @@ export function formatarCelular(digitos: string): string {
   if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
   return digitos;
 }
+
+/** Lead com o número de chegada: #1 é o primeiro cadastro do evento. */
+export type LeadNumerado = Lead & { numero: number };
+
+/** Numera pela ordem de cadastro e devolve do mais RECENTE para o mais antigo —
+ *  quem acabou de passar no estande aparece primeiro, e o número não muda. */
+export function numerarLeads(leads: Lead[]): LeadNumerado[] {
+  return [...leads]
+    .sort((a, b) => String(a.criadoEm ?? '').localeCompare(String(b.criadoEm ?? '')))
+    .map((l, i) => ({ ...l, numero: i + 1 }))
+    .reverse();
+}

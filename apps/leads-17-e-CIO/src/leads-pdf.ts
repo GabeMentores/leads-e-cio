@@ -2,14 +2,14 @@
 // (import dinâmico), para o jsPDF não entrar no bundle do chat.
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
-import { formatarCelular, formatarData, type Lead } from './lead-formato';
+import { formatarCelular, formatarData, type LeadNumerado } from './lead-formato';
 
 // O PDF não lê CSS: a cor da marca entra em RGB. É o azul #004CAB do logo
 // Belago, o mesmo que o globals.css usa como marca do canal.
 const AZUL_MARCA: [number, number, number] = [0, 76, 171];
 
 /** Monta o PDF com as linhas NA ORDEM em que estão na tela. */
-export function gerarLeadsPdf(leads: Lead[], agora: Date = new Date()): jsPDF {
+export function gerarLeadsPdf(leads: LeadNumerado[], agora: Date = new Date()): jsPDF {
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const giraram = leads.filter((l) => l.codigoUsadoEm).length;
 
@@ -26,8 +26,9 @@ export function gerarLeadsPdf(leads: Lead[], agora: Date = new Date()): jsPDF {
 
   autoTable(doc, {
     startY: 27,
-    head: [['Nome', 'E-mail', 'Celular', 'Empresa', 'Cargo', 'Código', 'Giro', 'Consentimento LGPD', 'Cadastro', 'Origem']],
+    head: [['Nº', 'Nome', 'E-mail', 'Celular', 'Empresa', 'Cargo', 'Código', 'Giro', 'Consentimento LGPD', 'Cadastro', 'Origem']],
     body: leads.map((l) => [
+      String(l.numero),
       l.nome,
       l.email,
       formatarCelular(l.celular),
@@ -42,11 +43,11 @@ export function gerarLeadsPdf(leads: Lead[], agora: Date = new Date()): jsPDF {
     styles: { font: 'helvetica', fontSize: 7.5, cellPadding: 1.8, overflow: 'linebreak' },
     headStyles: { fillColor: AZUL_MARCA, textColor: 255, fontStyle: 'bold' },
     alternateRowStyles: { fillColor: [244, 247, 252] },
-    // Celular, código, datas e origem numa linha só; nome, e-mail, empresa e
+    // Nº, celular, código, datas e origem numa linha só; nome, e-mail, empresa e
     // cargo absorvem o resto e quebram se precisar.
     columnStyles: {
-      2: { cellWidth: 'wrap' }, 5: { font: 'courier', cellWidth: 'wrap' },
-      7: { cellWidth: 'wrap' }, 8: { cellWidth: 'wrap' }, 9: { cellWidth: 'wrap' },
+      0: { cellWidth: 'wrap' }, 3: { cellWidth: 'wrap' }, 6: { font: 'courier', cellWidth: 'wrap' },
+      8: { cellWidth: 'wrap' }, 9: { cellWidth: 'wrap' }, 10: { cellWidth: 'wrap' },
     },
     margin: { left: 14, right: 14 },
   });
@@ -68,7 +69,7 @@ export function gerarLeadsPdf(leads: Lead[], agora: Date = new Date()): jsPDF {
 }
 
 /** Gera e baixa: leads-17-e-cio-AAAA-MM-DD.pdf. */
-export function exportarLeadsPdf(leads: Lead[]) {
+export function exportarLeadsPdf(leads: LeadNumerado[]) {
   const agora = new Date();
   gerarLeadsPdf(leads, agora).save(`leads-17-e-cio-${agora.toISOString().slice(0, 10)}.pdf`);
 }

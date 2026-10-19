@@ -192,7 +192,7 @@ export {
   KitPage, KitPageHeader, KitComposer, KitSendButton, KitTileGrid, KitIconTile, KitChip, KitHighlightCard, KitStatusPill, KitSplit, KitSplitMain, KitSplitAside, KitSkeleton, useSkeletonGate, KitChatBubble, KitBelaText, BelaPortrait,
   KitCard, KitBadge, KitInput, KitTextarea, KitSelect, KitMultiSelect, KitListInput, KitSearchPicker, KitTagPicker, KitPathPicker, KitField, KitConfidenceBadge, evidenciaBadge, KitEyebrow,
   KitButton, KitIconButton, KitAvatar, KitLogo, KitSwitch, KitCheckbox, KitNavLabel, KitNavItem, KitMenuItem,
-  KitMenuPanel, KitBackButton, KitBelaWidget, KitBelaStamp, KitBelaZone, KitBelaHeading, KitBelaBody, KitBelaActions, KitBelaAssistant, KitBelaItem, KitDrawer, KitTabs, KitCardRow, KitOrienta, useKitHover, useHashTab,
+  KitMenuPanel, KitBackButton, KitBelaWidget, KitBelaStamp, KitBelaZone, KitBelaHeading, KitBelaBody, KitBelaActions, KitBelaAssistant, KitBelaItem, KitDrawer, KitTabs, KitCardRow, KitCollapsibleCard, KitOrienta, useKitHover, useHashTab,
   type KitCardProps, type KitBadgeProps, type KitInputProps, type KitTextareaProps, type KitSelectProps,
   type KitMultiSelectProps, type KitMultiSelectOption, type KitListInputProps,
   type KitSearchPickerProps, type KitTagPickerProps, type KitSearchOption,
@@ -200,7 +200,7 @@ export {
   type KitFieldProps, type KitConfidenceBadgeProps, type KitButtonProps, type KitIconButtonProps,
   type KitAvatarProps, type KitSwitchProps, type KitNavItemProps, type KitMenuItemProps, type KitMenuPanelProps,
   type KitBelaWidgetProps, type KitDrawerProps, type KitTab, type KitTabsProps,
-  type KitCardRowProps, type KitOrientaProps, type KitOrientaItem, type KitPageProps, type KitPageHeaderProps, type KitComposerProps, type KitSendButtonProps, type KitTileGridProps,
+  type KitCardRowProps, type KitCollapsibleCardProps, type KitOrientaProps, type KitOrientaItem, type KitPageProps, type KitPageHeaderProps, type KitComposerProps, type KitSendButtonProps, type KitTileGridProps,
   type KitIconTileProps, type KitChipProps, type KitHighlightCardProps, type KitStatusPillProps, type KitChatBubbleProps,
 } from './bela-kit';
 // Padrões de composição das telas de administração do Console (seção + linha

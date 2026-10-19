@@ -1,17 +1,22 @@
-// Tela 3 — a tabela de leads do comercial (/leads#t=CHAVE). Espelha a tabela
+// Tela 3 — os leads do comercial (/leads#t=CHAVE). Espelha a tabela
 // `leads_17_e_cio` do Supabase (via GET /api/leads, protegido pelo
 // LEADS_ADMIN_TOKEN) e exporta o que está na tela em PDF.
 // A chave segue o mesmo trato do validador: viaja no FRAGMENTO do link e fica
 // em sessionStorage — nunca em query string, nunca no bundle.
+//
+// MOBILE FIRST (user, 2026-10-19): a tabela virou lista de cards colapsáveis.
+// Recolhido, o card diz quem é (nº · nome · status, e a empresa embaixo);
+// expandido, como falar com a pessoa (e-mail, telefone, cargo). Os 3 contadores
+// ficam numa linha só em qualquer largura.
 import * as React from 'react';
 import { FileDown, KeyRound, RefreshCw, Users } from 'lucide-react';
 import {
   KitPage, KitPageHeader, KitField, KitInput, KitButton, KitCard, KitBadge,
-  KitStateCard, KitKpi, KitTileGrid, KitSkeletonTable, useSkeletonGate,
-  DataTable, SortableTh, DataTd, useTableSort, type TableComparators,
+  KitStateCard, KitKpi, KitTileGrid, KitSkeletonTiles, KitSkeletonCards, KitCollapsibleCard,
+  KitFactList, useSkeletonGate, WEIGHT,
 } from '@bela/ui';
 import belagoLogo from './assets/belago-luxor-logo.svg';
-import { formatarCelular, formatarData, type Lead } from './lead-formato';
+import { formatarCelular, numerarLeads, type Lead, type LeadNumerado } from './lead-formato';
 
 const CHAVE_STORAGE = 'bela.leads.admin';
 
@@ -20,20 +25,44 @@ function chaveDaUrl(): string | null {
   return hash.startsWith('t=') ? new URLSearchParams(hash).get('t') : null;
 }
 
-type Coluna = 'nome' | 'email' | 'empresa' | 'cargo' | 'codigo' | 'giro' | 'criadoEm';
-const porTexto = (campo: keyof Lead) => (a: Lead, b: Lead) =>
-  String(a[campo] ?? '').localeCompare(String(b[campo] ?? ''), 'pt-BR');
-// 1º clique = "mais relevante primeiro": quem já girou no topo; cadastro mais
-// recente no topo; texto em ordem alfabética.
-const COMPARATORS: TableComparators<Lead, Coluna> = {
-  nome: porTexto('nome'),
-  email: porTexto('email'),
-  empresa: porTexto('empresa'),
-  cargo: porTexto('cargo'),
-  codigo: porTexto('codigo'),
-  giro: (a, b) => String(b.codigoUsadoEm ?? '').localeCompare(String(a.codigoUsadoEm ?? '')),
-  criadoEm: (a, b) => String(b.criadoEm ?? '').localeCompare(String(a.criadoEm ?? '')),
-};
+function StatusGiro({ lead }: { lead: Lead }) {
+  return lead.codigoUsadoEm
+    ? <KitBadge tone="success" dot>girou</KitBadge>
+    : <KitBadge tone="neutral" dot>aguardando</KitBadge>;
+}
+
+const umaLinha: React.CSSProperties = { minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' };
+
+function CardLead({ lead }: { lead: LeadNumerado }) {
+  return (
+    <KitCollapsibleCard
+      aria-label={`Lead ${lead.numero}: ${lead.nome}, ${lead.empresa}`}
+      summary={
+        <span style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <span style={{ flexShrink: 0, fontFamily: 'var(--font-mono)', fontSize: 'var(--caption-size)', color: 'var(--text-muted)' }}>
+              #{lead.numero}
+            </span>
+            <span style={{ ...umaLinha, flex: 1, fontSize: 'var(--body-md-size)', fontWeight: WEIGHT.semibold, color: 'var(--text-primary)' }}>
+              {lead.nome}
+            </span>
+            <span style={{ flexShrink: 0 }}><StatusGiro lead={lead} /></span>
+          </span>
+          <span style={{ ...umaLinha, fontSize: 'var(--body-sm-size)', color: 'var(--text-secondary)' }}>{lead.empresa}</span>
+        </span>
+      }
+    >
+      <KitFactList
+        labelWidth={72}
+        rows={[
+          { label: 'E-mail', value: <a href={`mailto:${lead.email}`} style={{ color: 'var(--text-brand)', wordBreak: 'break-all' }}>{lead.email}</a> },
+          { label: 'Telefone', value: <a href={`tel:+55${lead.celular}`} style={{ color: 'var(--text-brand)' }}>{formatarCelular(lead.celular)}</a> },
+          { label: 'Cargo', value: lead.cargo },
+        ]}
+      />
+    </KitCollapsibleCard>
+  );
+}
 
 export function LeadsScreen() {
   const [chave, setChave] = React.useState<string>(() => {
@@ -72,9 +101,8 @@ export function LeadsScreen() {
 
   React.useEffect(() => { void carregar(); }, [carregar]);
 
-  const linhas = leads ?? [];
-  const sort = useTableSort(linhas, COMPARATORS);
-  const giraram = linhas.filter((l) => l.codigoUsadoEm).length;
+  const lista = React.useMemo(() => numerarLeads(leads ?? []), [leads]);
+  const giraram = lista.filter((l) => l.codigoUsadoEm).length;
   const mostrarEsqueleto = useSkeletonGate(carregando && leads === null);
 
   const exportar = async () => {
@@ -82,13 +110,14 @@ export function LeadsScreen() {
     try {
       // Import sob demanda: o gerador de PDF não pesa no chat do participante.
       const { exportarLeadsPdf } = await import('./leads-pdf');
-      exportarLeadsPdf(sort.sorted);
+      exportarLeadsPdf(lista);
     } finally {
       setExportando(false);
     }
   };
 
-  // Mesmo cabeçalho do chat e do validador, mais largo: aqui a página é a tabela.
+  // Mesmo cabeçalho do chat e do validador. A coluna segura a leitura no
+  // desktop; no celular ocupa a largura toda.
   const shell = (largura: number, children: React.ReactNode) => (
     <div className="bela-kit" style={{ height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column', background: 'hsl(var(--surface-0))' }}>
       <header style={{ flexShrink: 0, background: 'var(--surface-card)', borderBottom: '1px solid var(--border-subtle)' }}>
@@ -96,7 +125,7 @@ export function LeadsScreen() {
           <img src={belagoLogo} alt="Belago | Luxor" style={{ height: 30, display: 'block' }} />
         </div>
       </header>
-      <KitPage stack style={{ width: '100%', maxWidth: largura, padding: 'var(--space-5)' }}>
+      <KitPage stack style={{ width: '100%', maxWidth: largura, padding: 'var(--space-5) var(--space-4)' }}>
         {children}
       </KitPage>
     </div>
@@ -138,16 +167,16 @@ export function LeadsScreen() {
     );
   }
 
-  return shell(1280,
+  return shell(880,
     <>
       <KitPageHeader
         title="Leads"
         actions={
           <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-            <KitButton variant="secondary" disabled={carregando} onClick={() => void carregar()} iconLeft={<RefreshCw size={16} aria-hidden="true" />}>
+            <KitButton variant="secondary" size="xs" disabled={carregando} onClick={() => void carregar()} iconLeft={<RefreshCw size={14} aria-hidden="true" />}>
               {carregando ? 'Atualizando…' : 'Atualizar'}
             </KitButton>
-            <KitButton disabled={exportando || linhas.length === 0} onClick={() => void exportar()} iconLeft={<FileDown size={16} aria-hidden="true" />}>
+            <KitButton size="xs" disabled={exportando || lista.length === 0} onClick={() => void exportar()} iconLeft={<FileDown size={14} aria-hidden="true" />}>
               {exportando ? 'Gerando…' : 'Exportar PDF'}
             </KitButton>
           </div>
@@ -155,7 +184,10 @@ export function LeadsScreen() {
       />
 
       {mostrarEsqueleto ? (
-        <KitSkeletonTable rows={8} toolbar={false} />
+        <>
+          <KitSkeletonTiles count={3} cols={3} />
+          <KitSkeletonCards count={4} lines={2} />
+        </>
       ) : falhou && leads === null ? (
         <KitCard padding="lg">
           <KitStateCard
@@ -166,7 +198,7 @@ export function LeadsScreen() {
             <KitButton variant="soft" onClick={() => void carregar()}>Tentar de novo</KitButton>
           </KitStateCard>
         </KitCard>
-      ) : leads === null ? null : leads.length === 0 ? (
+      ) : leads === null ? null : lista.length === 0 ? (
         <KitCard padding="lg">
           <KitStateCard
             icon={<Users size={28} aria-hidden="true" />}
@@ -176,53 +208,17 @@ export function LeadsScreen() {
         </KitCard>
       ) : (
         <>
-          <KitTileGrid cols={3}>
-            <KitKpi label="Leads" value={String(linhas.length)} />
-            <KitKpi label="Já giraram" value={String(giraram)} />
-            <KitKpi label="Aguardando giro" value={String(linhas.length - giraram)} />
+          <KitTileGrid cols={3} fixed gap="var(--space-3)">
+            <KitKpi label="Leads" value={String(lista.length)} />
+            <KitKpi label="Giraram" value={String(giraram)} />
+            <KitKpi label="Aguardando" value={String(lista.length - giraram)} />
           </KitTileGrid>
 
-          <DataTable aria-label="Leads cadastrados" minWidth={1180} maxHeight={640}>
-            <thead>
-              <tr className="bg-surface-2 text-left text-text-secondary">
-                <SortableTh colKey="nome" sort={sort}>Nome</SortableTh>
-                <SortableTh colKey="email" sort={sort}>E-mail</SortableTh>
-                <SortableTh>Celular</SortableTh>
-                <SortableTh colKey="empresa" sort={sort}>Empresa</SortableTh>
-                <SortableTh colKey="cargo" sort={sort}>Cargo</SortableTh>
-                <SortableTh colKey="codigo" sort={sort}>Código</SortableTh>
-                <SortableTh colKey="giro" sort={sort}>Giro</SortableTh>
-                <SortableTh>Consentimento LGPD</SortableTh>
-                <SortableTh colKey="criadoEm" sort={sort}>Cadastro</SortableTh>
-                <SortableTh>Origem</SortableTh>
-              </tr>
-            </thead>
-            <tbody>
-              {sort.sorted.map((l) => (
-                <tr key={l.email} className="border-t border-border-table align-top">
-                  <DataTd className="text-text-primary">{l.nome}</DataTd>
-                  <DataTd>{l.email}</DataTd>
-                  <DataTd className="whitespace-nowrap">{formatarCelular(l.celular)}</DataTd>
-                  <DataTd>{l.empresa}</DataTd>
-                  <DataTd>{l.cargo}</DataTd>
-                  <DataTd className="font-mono whitespace-nowrap">{l.codigo}</DataTd>
-                  <DataTd className="whitespace-nowrap">
-                    {l.codigoUsadoEm ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3xs)', alignItems: 'flex-start' }}>
-                        <KitBadge tone="success" dot>girou</KitBadge>
-                        <span className="text-text-muted">{formatarData(l.codigoUsadoEm)}</span>
-                      </div>
-                    ) : (
-                      <KitBadge tone="neutral" dot>aguardando</KitBadge>
-                    )}
-                  </DataTd>
-                  <DataTd className="whitespace-nowrap">{formatarData(l.consentimentoEm)}</DataTd>
-                  <DataTd className="whitespace-nowrap">{formatarData(l.criadoEm)}</DataTd>
-                  <DataTd className="text-text-muted whitespace-nowrap">{l.origem}</DataTd>
-                </tr>
-              ))}
-            </tbody>
-          </DataTable>
+          <div role="list" aria-label="Leads cadastrados" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {lista.map((l) => (
+              <div role="listitem" key={l.email}><CardLead lead={l} /></div>
+            ))}
+          </div>
         </>
       )}
     </>,

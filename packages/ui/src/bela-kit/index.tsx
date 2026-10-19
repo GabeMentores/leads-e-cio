@@ -438,17 +438,21 @@ export interface KitTileGridProps {
    *  ~340px por coluna e cai para 2 mais cedo; `compact` (padrão) = tile curto
    *  (KPI), que segura 4 colunas até ~260px cada. Ver bela-kit.css. */
   tile?: 'compact' | 'content';
+  /** FIXO (autorizado pelo user, 2026-10-19 — KPIs da tabela de leads): segura
+   *  `cols` em qualquer largura, sem a escada N → 2 → 1. Só para tiles curtos
+   *  cujo número cabe em ~100px (contadores); nunca para card de conteúdo. */
+  fixed?: boolean;
   gap?: string;
   children: React.ReactNode;
   style?: React.CSSProperties;
 }
-export function KitTileGrid({ cols = 4, tile = 'compact', gap, children, style }: KitTileGridProps) {
+export function KitTileGrid({ cols = 4, tile = 'compact', fixed = false, gap, children, style }: KitTileGridProps) {
   return (
     // O host existe porque uma grade não pode fazer container-query de si
     // mesma — quem declara `container-type` precisa ser o pai.
     <div className="bela-kit-tiles-host">
       <div
-        className={tile === 'content' ? 'bela-kit-tiles bela-kit-tiles-wide' : 'bela-kit-tiles'}
+        className={['bela-kit-tiles', tile === 'content' && 'bela-kit-tiles-wide', fixed && 'bela-kit-tiles-fixed'].filter(Boolean).join(' ')}
         style={{ ['--tile-cols' as string]: cols, ...(gap ? { ['--tile-gap' as string]: gap } : null), ...style } as React.CSSProperties}
       >
         {children}
@@ -2983,6 +2987,80 @@ export function KitCardRow({ leading, children, trailing, minHeight, affordance 
         <ChevronRight size={16} style={{ flexShrink: 0, color: hover ? 'var(--text-brand)' : 'var(--text-muted)', transition: 'var(--transition-control)' }} aria-hidden="true" />
       )}
     </button>
+  );
+}
+
+// ---- Card colapsável -------------------------------------------------------
+// Autorizado pelo user em 2026-10-19 (tabela de leads do e-CIO virou lista de
+// cards, mobile first). O card mostra um RESUMO sempre visível e esconde o
+// DETALHE até alguém pedir. Quem clica é a faixa inteira do resumo — alvo
+// grande no celular —, e o chevron só anuncia o estado (para baixo fechado,
+// gira para cima aberto). Abrir e fechar animam a altura sem número mágico:
+// a grade vai de `0fr` a `1fr`, sem bounce.
+export interface KitCollapsibleCardProps {
+  /** O que fica à vista com o card recolhido. */
+  summary: React.ReactNode;
+  /** O que aparece ao expandir. */
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  /** Nome acessível da faixa clicável (o resumo costuma ser só valores). */
+  'aria-label'?: string;
+}
+export function KitCollapsibleCard({ summary, children, defaultOpen = false, 'aria-label': ariaLabel }: KitCollapsibleCardProps) {
+  const [open, setOpen] = React.useState(defaultOpen);
+  const { hover, hoverProps } = useKitHover();
+  const [focus, setFocus] = React.useState(false);
+  const regionId = React.useId();
+  return (
+    <div
+      style={{
+        borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--surface-card)',
+        boxShadow: focus ? 'var(--focus-ring)' : 'none', transition: 'var(--transition-control)', overflow: 'hidden',
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={regionId}
+        aria-label={ariaLabel}
+        onClick={() => setOpen((v) => !v)}
+        {...hoverProps}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 'var(--space-3)', width: '100%', textAlign: 'left',
+          padding: 'var(--space-3) var(--space-4)', border: 'none', margin: 0, boxSizing: 'border-box',
+          background: hover ? 'var(--surface-subtle)' : 'transparent', cursor: 'pointer',
+          transition: 'var(--transition-control)', fontFamily: 'var(--font-body)', color: 'inherit',
+        }}
+      >
+        <span style={{ flex: 1, minWidth: 0 }}>{summary}</span>
+        <ChevronDown
+          size={18}
+          aria-hidden="true"
+          style={{
+            flexShrink: 0, color: hover ? 'var(--text-brand)' : 'var(--text-muted)',
+            transform: open ? 'rotate(180deg)' : 'none',
+            transition: 'transform var(--duration-base) var(--ease-out), color var(--duration-fast) var(--ease-out)',
+          }}
+        />
+      </button>
+      <div
+        id={regionId}
+        role="region"
+        aria-hidden={!open}
+        style={{
+          display: 'grid', gridTemplateRows: open ? '1fr' : '0fr',
+          transition: 'grid-template-rows var(--duration-base) var(--ease-out)',
+        }}
+      >
+        <div style={{ overflow: 'hidden', minHeight: 0 }} inert={!open}>
+          <div style={{ padding: 'var(--space-3) var(--space-4) var(--space-4)', borderTop: '1px solid var(--border-subtle)' }}>
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -190,6 +190,9 @@
 @container (max-width: 700px) {
   .bela-kit-tiles.bela-kit-tiles-wide { grid-template-columns: minmax(0, 1fr); }
 }
+/* FIXO (2026-10-19): duas classes vencem as regras de uma classe acima e as
+   @media abaixo — a fileira segura `--tile-cols` em qualquer largura. */
+.bela-kit-tiles.bela-kit-tiles-fixed { grid-template-columns: repeat(var(--tile-cols, 4), minmax(0, 1fr)); }
 
 /* PLACEHOLDER (Figma Bela_By_Belago, 2026-08-26): o cinza da marca em opacidade
    CHEIA. Nenhum componente definia isso, então valia o padrão do navegador — a
