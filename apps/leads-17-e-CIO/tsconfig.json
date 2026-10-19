@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vite/client", "node"],
+    "paths": {
+      "@bela/tokens": ["../../packages/tokens/src/index.ts"],
+      "@bela/ui": ["../../packages/ui/src/index.ts"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "shared", "server", "api", "vite-plugin-leads-api.ts", "vite.config.ts"]
+}

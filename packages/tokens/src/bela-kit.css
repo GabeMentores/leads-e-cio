@@ -1,0 +1,367 @@
+/* =============================================================================
+   bela-kit — ADAPTADOR de tokens, escopado a `.bela-kit`.
+   -----------------------------------------------------------------------------
+   POR QUE EXISTE. Os componentes do kit bela usam estilo inline e consomem cor
+   como `var(--x)` (valor de cor pronto). O resto do app consome a ponte HSL do
+   Tailwind/shadcn, `hsl(var(--x))`, onde o token é um TRIPLETO de canais. Os dois
+   formatos não se misturam — daí um escopo próprio.
+
+   O QUE MUDOU (unificação, 2026-08-08). Este arquivo tinha uma SEGUNDA CÓPIA
+   LITERAL da paleta da marca (hex), independente dos primitivos de
+   `packages/tokens/src/tokens.css`. Eram dois lugares com os mesmos nomes
+   semânticos (`--text-primary`, `--surface-brand`…) e valores próprios: mudar a
+   marca num deles movia metade das telas e deixava a outra metade para trás.
+
+   AGORA: **zero valor de cor literal aqui.** Todo primitivo do kit deriva do
+   primitivo correspondente em `tokens.css` (que herda via `:root`), só
+   embrulhado em `hsl()` para virar cor pronta. `tokens.css` é a ÚNICA fonte de
+   valor de marca — rebrand = editar o bloco PRIMITIVES de lá, e as duas famílias
+   de tela andam juntas.
+
+   A camada SEMÂNTICA do kit continua aqui e inalterada de propósito: os nomes do
+   kit (`--surface-page`, `--surface-card`, `--surface-subtle`) não são sinônimos
+   dos do app (`--surface-0/1/2`) — ex.: `surface-page` do kit é branco, enquanto
+   `--surface-0` do app é #F5F5F5. Alinhar os NOMES mudaria cor; não é o objetivo.
+
+   Não-cor (space/radius/shadow/motion/type) já é global em `tokens.css`.
+   ========================================================================== */
+.bela-kit {
+  /* ── PRIMITIVOS — derivados de tokens.css. Nenhum literal. ──────────────── */
+  --bela-roxo:        hsl(var(--p-purple-500));
+  --bela-asfalto:     hsl(var(--p-neutral-900));
+  --bela-cinza:       hsl(var(--p-neutral-400));
+  --bela-cinza-claro: hsl(var(--p-neutral-200));
+  --bela-branco:      hsl(var(--p-neutral-0));
+
+  --purple-50:  hsl(var(--p-purple-50));   --purple-100: hsl(var(--p-purple-100));
+  --purple-200: hsl(var(--p-purple-200));  --purple-250: hsl(var(--p-purple-250));
+  --purple-300: hsl(var(--p-purple-300));
+  --purple-400: hsl(var(--p-purple-400));  --purple-500: hsl(var(--p-purple-500));
+  --purple-600: hsl(var(--p-purple-600));  --purple-700: hsl(var(--p-purple-700));
+  --purple-800: hsl(var(--p-purple-800));  --purple-900: hsl(var(--p-purple-900));
+
+  --ink-900: hsl(var(--p-neutral-900)); --ink-800: hsl(var(--p-neutral-800));
+  --ink-700: hsl(var(--p-neutral-700)); --ink-600: hsl(var(--p-neutral-600));
+  --ink-500: hsl(var(--p-neutral-500));
+  /* AA: o ink-400 da marca (#9F9F9F) reprova como texto (2.6:1). O 450 é o cinza
+     mais claro que passa 4.5:1 tanto no card branco quanto no fundo #F5F5F5 do
+     app — em tokens.css ele está em 42% (#6B6B6B), um passo mais escuro que o
+     #707070 que este arquivo trazia. Ficou o valor de tokens.css: mais escuro
+     nunca piora contraste, e é o que tem racional de a11y documentado. */
+  --ink-450: hsl(var(--p-neutral-450));
+  --ink-400: hsl(var(--p-neutral-400)); --ink-300: hsl(var(--p-neutral-300));
+  --ink-200: hsl(var(--p-neutral-200)); --ink-100: hsl(var(--p-neutral-100));
+  --ink-50:  hsl(var(--p-neutral-50));  --white:   hsl(var(--p-neutral-0));
+
+  --green-100: hsl(var(--p-green-surface)); --green-500: hsl(var(--p-green-solid)); --green-700: hsl(var(--p-green-text));
+  --amber-100: hsl(var(--p-amber-surface)); --amber-500: hsl(var(--p-amber-solid)); --amber-700: hsl(var(--p-amber-text));
+  --red-100:   hsl(var(--p-red-surface));   --red-500:   hsl(var(--p-red-solid));   --red-700:   hsl(var(--p-red-text));
+  /* Azul (família "em movimento" dos status de chamado, 2026-08-23) — mesmo
+     primitivo --p-blue que a era Tailwind já usa em status-regular; nada novo. */
+  --blue-100:  hsl(var(--p-blue-surface));  --blue-500:  hsl(var(--p-blue-solid));  --blue-700:  hsl(var(--p-blue-text));
+  /* Cinza arroxeado da bolha própria no chat de página (Figma 26/08). */
+  --slate-500: hsl(var(--p-slate-500));
+
+  /* ── SEMÂNTICA DO KIT — inalterada (nomes e valores). ───────────────────── */
+  /* Croma do cinza — ver a nota em tokens.css: apoio e bordas são roxo
+     acinzentado e lavanda, não cinza neutro (Figma 26/08). */
+  --text-primary: var(--ink-900); --text-secondary: var(--slate-500);
+  --text-muted: var(--slate-500);
+  --text-brand: var(--purple-500); --text-inverse: var(--white); --text-on-brand: var(--white);
+  /* TEXTO ROXO FORTE e TEXTO DE ALERTA (varredura WCAG no escuro, 2026-09-03).
+     O roxo-700 e o âmbar-700 eram usados CRUS como cor de texto (badge brand,
+     avatar, "bela resolveu", contagem "em aberto") — no claro passam (7:1+),
+     no escuro ficam roxo-escuro sobre roxo-escuro (1.2:1) e âmbar sobre
+     asfalto (3.3:1). Primitivo não vira no escuro; semântica vira. */
+  --text-brand-strong: var(--purple-700); --text-warning: var(--amber-700);
+  /* Texto secundário SOBRE superfícies brand-soft/lavanda. No claro o cinza
+     funciona (superfície quase branca); no escuro o cinza sobre roxo lê
+     "sujo" (gray-on-color, achado da varredura Fase 7) — vira lavanda clara. */
+  --text-secondary-on-brand: var(--slate-500);
+  --text-muted-on-brand: var(--slate-500);
+  /* Texto do badge NEUTRO (KitBadge tone=neutral, Figma nó 277:1803): #3D3D3D
+     no claro — mais forte que --text-secondary, é atributo do item, não apoio.
+     Precisa ser SEMÂNTICO: o fundo do badge é --surface-card (vira no escuro);
+     um primitivo fixo aqui cai a ~1.5:1 sobre o card #1F1F1F. Espelha o par
+     --tag-neutral-fg do app (neutral-600 claro / neutral-300 escuro). */
+  --text-badge-neutral: var(--ink-700);
+
+  /* Fundo da PÁGINA como cor pronta. O `--surface-0` do app é TRIPLETO HSL e
+     não serve dentro de `.bela-kit` (aqui token é cor completa) — usá-lo direto
+     invalida a regra inteira, que foi o que aconteceu com o filete da sidebar. */
+  --surface-app: hsl(var(--p-app-bg));
+  --surface-page: var(--white); --surface-subtle: var(--ink-50); --surface-card: var(--white);
+  --surface-inverse: var(--ink-900); --surface-brand: var(--purple-500); --surface-brand-hover: var(--purple-600);
+  --surface-brand-active: var(--purple-700); --surface-brand-subtle: var(--purple-50);
+  --surface-brand-subtle-hover: var(--purple-250);
+  --surface-brand-soft: var(--purple-100); --surface-overlay: hsl(var(--p-neutral-900) / 0.56);
+  /* Bolha da própria pessoa: tom quieto no chat que vive dentro de uma página,
+     Roxo pleno no drawer, onde a conversa é a superfície inteira. */
+  --surface-bubble-self: var(--slate-500);
+  --surface-bubble-self-focus: var(--purple-500);
+  --surface-bubble-self-fg: var(--white);
+  --surface-disabled: var(--ink-100); /* recessed tile — darker than the #F5F5F5 page so it reads */
+
+  --border-subtle: var(--purple-100); --border-default: var(--purple-100); --border-strong: var(--ink-400);
+  /* BORDA DE TABELA — neutra, não lavanda (user, 2026-08-28). A lavanda é a cor
+     da CAMADA BELA (fundo de widget, superfície de marca); usada como régua de
+     uma tabela ITSM-nativa, ela tinge o dado e faz a tabela inteira parecer
+     enriquecida pela bela. A régua de dado é traço, não cor de marca. */
+  --border-table: var(--ink-100);
+
+  /* Ponte do bridge (ver tokens.css): aqui os tokens JÁ são cor completa,
+     então o `--c-*` aponta direto — é o que faz as classes Tailwind de cor
+     funcionarem dentro de uma tela em escopo `.bela-kit`. Vale também no
+     escuro: `var(--token)` resolve no ponto de uso. */
+  --c-border-default: var(--border-default);
+  --c-border-strong: var(--border-strong);
+  --c-border-subtle: var(--border-subtle);
+  --c-border-table: var(--border-table);
+  --c-text-inverse: var(--text-inverse);
+  --c-text-muted: var(--text-muted);
+  --c-text-primary: var(--text-primary);
+  --c-text-secondary: var(--text-secondary);
+  --border-brand: var(--purple-500); --border-disabled: var(--ink-300);
+
+  --focus-ring: 0 0 0 3px hsl(var(--p-purple-500) / 0.28);
+  --gradient-brand: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-400) 100%);
+  --gradient-wash: linear-gradient(180deg, var(--white) 0%, var(--purple-50) 100%);
+}
+
+.dark .bela-kit {
+  /* Só a semântica vira no escuro — os primitivos acima seguem valendo, herdados
+     de `:root` (o `.dark` de tokens.css também só troca semântica). */
+  --text-primary: var(--white); --text-secondary: var(--ink-300); --text-muted: var(--ink-400);
+  --text-brand: var(--purple-300); --text-inverse: var(--ink-900);
+  --text-brand-strong: var(--purple-200); --text-warning: var(--amber-500);
+  --text-secondary-on-brand: var(--purple-200);
+  --text-muted-on-brand: var(--purple-300);
+  --text-badge-neutral: var(--ink-300); /* #C4C4C4 — ~9.5:1 sobre o card #1F1F1F */
+
+  --surface-page: var(--ink-900); --surface-subtle: var(--ink-800);
+  --surface-card: hsl(var(--p-neutral-850)); /* #1F1F1F — degrau de card do escuro */
+  --surface-inverse: var(--white); --surface-brand-subtle: hsl(var(--p-purple-500) / 0.18);
+  --surface-brand-subtle-hover: hsl(var(--p-purple-500) / 0.34);
+  --surface-brand-soft: hsl(var(--p-purple-500) / 0.28); --surface-disabled: var(--ink-800);
+
+  --border-disabled: hsl(var(--p-neutral-0) / 0.14);
+  --border-subtle: hsl(var(--p-neutral-0) / 0.08); --border-default: hsl(var(--p-neutral-0) / 0.16);
+  --border-strong: hsl(var(--p-neutral-0) / 0.32);
+}
+
+/* PLACEHOLDER (Figma Bela_By_Belago, 2026-08-26): o cinza da marca em opacidade
+   CHEIA. Nenhum componente definia isso, então valia o padrão do navegador — a
+   cor do texto a ~50% de opacidade, que num campo branco cai para ~2,7:1 e sai
+   da paleta. Regra do DS, num lugar só: todo campo do kit herda. */
+.bela-kit input::placeholder,
+.bela-kit textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+/* GRADE DE TILES — KPIs E CARDS (2026-08-26). Nunca `auto-fit`: com um número
+   fixo de colunas ele quebra em 3+1 assim que falta um punhado de pixels, e uma
+   linha órfã lê como defeito. Colunas DECLARADAS, degraus N → 2 → 1.
+
+   CONTAINER QUERY, não media query (3ª calibragem, com o user olhando a tela):
+   o que decide quantas colunas cabem é a largura DA GRADE, não a da janela —
+   e o limiar depende do conteúdo do tile. Um KPI ("04 abertos") vive bem com
+   ~260px; um card de chamado, com título + badges + fala da bela, precisa de
+   ~340px. Na mesma largura de tela (~1500), os KPIs ficam em 4 e os cards caem
+   para 2 — foi exatamente o que o user pediu nas duas telas. */
+.bela-kit-tiles-host { container-type: inline-size; }
+.bela-kit-tiles {
+  display: grid;
+  gap: var(--tile-gap, var(--space-4));
+  grid-template-columns: repeat(var(--tile-cols, 4), minmax(0, 1fr));
+}
+/* Tile compacto (KPI): 4 colunas até a grade ter ~1040px. */
+@container (max-width: 1040px) {
+  .bela-kit-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (max-width: 540px) {
+  .bela-kit-tiles { grid-template-columns: minmax(0, 1fr); }
+}
+/* Tile de conteúdo (card de chamado/serviço): cada coluna precisa de ~340px —
+   o card do Figma tem 389 — então 4-up só quando a grade passa de ~1400px. */
+@container (max-width: 1400px) {
+  .bela-kit-tiles.bela-kit-tiles-wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (max-width: 700px) {
+  .bela-kit-tiles.bela-kit-tiles-wide { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* PLACEHOLDER (Figma Bela_By_Belago, 2026-08-26): o cinza da marca em opacidade
+   CHEIA. Nenhum componente definia isso, então valia o padrão do navegador — a
+   cor do texto a ~50% de opacidade, que num campo branco cai para ~2,7:1 e sai
+   da paleta. Regra do DS, num lugar só: todo campo do kit herda. */
+.bela-kit input::placeholder,
+.bela-kit textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+/* GRADE DE TILES — KPIs E CARDS (2026-08-26). Nunca `auto-fit`: com um número
+   fixo de colunas, o auto-fit quebra em 3+1 assim que falta um punhado de
+   pixels, e uma linha órfã lê como defeito de layout, não como responsividade.
+   Aqui o número de colunas é DECLARADO e os degraus são de 2 em 2 — N → 2 → 1.
+   A MESMA grade serve a fileira de KPIs e a grade de cards da mesma tela, para
+   que as duas tenham sempre a mesma quantidade por linha e os cards caiam
+   alinhados sob os tiles. */
+.bela-kit-tiles {
+  display: grid;
+  gap: var(--tile-gap, var(--space-4));
+  grid-template-columns: repeat(var(--tile-cols, 4), minmax(0, 1fr));
+}
+/* A fileira cheia vale até bem baixo: a 1400px de viewport ainda sobram ~250px
+   por coluna, que é o suficiente depois que os badges do card desceram para a
+   linha de baixo (era o aperto que fazia o título quebrar). Só abaixo disso cai
+   para DOIS, e só bem estreito para um. Nunca três: grupo de 2 é a unidade de
+   quebra, para KPIs e cards caírem sempre alinhados entre si. */
+@media (max-width: 1399px) {
+  .bela-kit-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .bela-kit-tiles { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* SPLIT conteúdo + aside (2026-08-27). Três telas injetavam o MESMO CSS na
+   própria página com <style> — Nova Solicitação, artigo da KB e o detalhe do
+   chamado —, cada uma com a sua largura de aside e o seu ponto de empilhar.
+   Media query não existe em style inline, e era essa a desculpa; a resposta
+   certa é o CSS morar no DS, não na tela. Medida do Figma: conteúdo fluido +
+   aside de 400, 48 entre eles. */
+.bela-kit-split { display: flex; gap: var(--space-12); align-items: flex-start; }
+/* Conteudo : bela = 2 : 1 — ver o bloco da coluna da bela, abaixo. */
+.bela-kit-split > .bela-kit-split-main { flex: 2 1 0; min-width: 320px; }
+/* Coluna da bela: UM TERCO do espaco de conteudo, travada entre 320 e 400
+   (user, 2026-08-27). Regra PROPORCIONAL, nao limiar: `2 1 0` no conteudo e
+   `1 1 0` aqui fazem a divisao ser sempre 2:1, entao a bela acompanha a pagina
+   em vez de ficar parada. O piso e o teto so entram como trava nas pontas.
+   Historico do mesmo dia, porque foram tres tentativas: era `0 0 400px` (fixa,
+   nao devolvia um pixel ao formulario); virou teto 400 + piso no conteudo (a
+   bela so cedia DEPOIS de o formulario bater no piso, entao continuava estatica
+   em 400); virou base fixa de 880 e depois 720 (limiar chutado, calibrado no
+   olho). A proporcao dispensa os tres numeros magicos.
+   Onde a trava age: abaixo de ~1110px de coluna o terco daria menos de 320 e a
+   bela para no piso, com o formulario levando toda a sobra; acima de ~1250 o
+   terco passaria de 400 e ela para no teto, de novo com o formulario levando o
+   resto. Entre os dois ela flutua. */
+.bela-kit-split > .bela-kit-split-aside {
+  flex: 1 1 0; min-width: 320px; max-width: 400px; position: sticky; top: var(--space-6);
+}
+@media (max-width: 1023px) {
+  .bela-kit-split { flex-direction: column; }
+  .bela-kit-split > .bela-kit-split-main,
+  /* Empilhado, o teto de 400 e o piso de 320 nao valem: a coluna vira largura
+     cheia. Sem soltar os dois, a bela ficaria num bloco de 400px no meio de uma
+     tela estreita. */
+  .bela-kit-split > .bela-kit-split-aside { flex: 0 1 auto; width: 100%; min-width: 0; max-width: none; position: static; }
+}
+
+/* ESQUELETO de carga. Era um @keyframes copiado dentro de Meus chamados. */
+@keyframes bela-kit-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+.bela-kit-skeleton {
+  background: var(--surface-subtle);
+  border-radius: var(--radius-card);
+  animation: bela-kit-pulse 1.4s var(--ease-out) infinite;
+}
+@media (prefers-reduced-motion: reduce) { .bela-kit-skeleton { animation: none; } }
+
+/* BADGE DE CONFIANÇA — contração condicional (user, 2026-08-27).
+   A linha do rótulo é `nowrap`: o badge nunca cai sozinho para baixo, então
+   quem quebra em campo estreito é o RÓTULO, espremido pelo badge de
+   "confiança 92%" (~95px). Abaixo do limiar o badge encolhe para "conf. 92%"
+   (~68px) e devolve ~27px ao rótulo — o texto inteiro continua acessível no
+   hover (`title`) e para leitor de tela (`aria-label`).
+   CONTAINER QUERY, não media query: o que decide se cabe é a largura DO CAMPO
+   (três campos numa fileira ficam estreitos numa janela larga), nunca a da
+   janela. Mesmo raciocínio de `.bela-kit-tiles`.
+   LIMIAR MEDIDO na tela, não estimado: badge inteiro 104px, contraído 69px
+   (economia de 35px); o rótulo mais largo do projeto — "Consegue trabalhar
+   assim?" — tem 201px e portanto exige 313px de linha para não quebrar com a
+   palavra inteira. 320 cobre isso com folga. O primeiro palpite (260) deixava
+   justamente esse rótulo quebrar, que era o caso a resolver.
+   Limiar ÚNICO, não por campo, de propósito: campos da mesma fileira têm a
+   mesma largura, então a fileira inteira contrai junto. Por campo, uma fileira
+   exibiria "confiança" num rótulo curto e "conf." no vizinho — dois pesos na
+   mesma linha, que lê como descuido, não como adaptação. */
+.bela-kit-field-label { container: bela-field / inline-size; }
+.bela-kit-conf-abbr { display: none; }
+@container bela-field (max-width: 320px) {
+  .bela-kit-conf-full { display: none; }
+  .bela-kit-conf-abbr { display: inline; }
+}
+
+/* GRADE DE CAMPOS DE FORMULÁRIO — 3 → 2 → 1 coluna (user, 2026-08-27).
+   Campos têm sempre a MESMA largura: a fileira de dois deixa a terceira coluna
+   em branco em vez de esticar os dois. Quando a coluna aperta a ponto de os
+   campos quebrarem, a grade cai para 2 e depois para 1.
+
+   LIMIARES DERIVADOS DA MEDIDA, não redondos por gosto: o rótulo mais largo do
+   projeto ("Consegue trabalhar assim?", 201px) + o badge de confiança já
+   contraído (69px) + o gap (8px) exigem 278px de campo. Daí:
+     3 colunas → 3 × 278 + 2 × 16 de gap = 866  → cai para 2 abaixo de 880;
+     2 colunas → 2 × 278 + 1 × 16 de gap = 572  → cai para 1 abaixo de 580.
+   Nos dois limiares o campo pousa em ~282px, logo acima do mínimo — nenhum
+   rótulo quebra em nenhum degrau.
+
+   CONTAINER nomeado: quem manda é a largura da COLUNA do formulário, não a da
+   janela (a coluna divide espaço com o painel da bela, de 400px). O nome evita
+   que esta consulta e a do badge — que tem container próprio na linha do
+   rótulo — se cruzem. */
+.bela-kit-fields-host { container: bela-fields / inline-size; }
+.bela-kit-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+@container bela-fields (max-width: 880px) {
+  .bela-kit-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container bela-fields (max-width: 580px) {
+  .bela-kit-fields { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* CHECKBOX (user, 2026-09-04: "está grosseiro, deixe mais suave e com bordas
+   arredondadas"). Era o desenho NATIVO do navegador com `accent-color` — um
+   quadrado de canto vivo e traço duro, que numa tabela inteira de lavanda e
+   cantos de 14px destoava linha a linha.
+   `appearance: none` para poder desenhar: mesma família de traço dos campos
+   (--border-default), canto de 6px, e o roxo da marca só no estado marcado. O
+   input continua NATIVO por baixo — semântica, teclado e o `:focus-visible`
+   vêm de graça, que é a razão de o primitivo nunca ter virado uma <div>. */
+.bela-kit-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
+  background: var(--surface-card);
+  display: inline-grid;
+  place-content: center;
+  transition: background var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out);
+}
+.bela-kit-checkbox:hover:not(:disabled) { border-color: var(--border-brand); }
+/* O PREENCHIMENTO vem de `box-shadow: inset`, não de `background`: medido no
+   navegador, o `background` deste input é ignorado mesmo com valor literal e
+   inline (resquício do desenho nativo com `appearance: none`). A sombra interna
+   pinta a caixa inteira e responde ao token normalmente. */
+.bela-kit-checkbox:checked {
+  box-shadow: inset 0 0 0 16px var(--surface-brand);
+  border-color: var(--surface-brand);
+}
+/* Checkmark desenhado (não o glifo do sistema, que muda de forma por SO). */
+.bela-kit-checkbox:checked::after {
+  content: '';
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--text-on-brand);
+  border-bottom: 2px solid var(--text-on-brand);
+  transform: translateY(-1px) rotate(-45deg);
+}
+.bela-kit-checkbox:disabled { opacity: 0.5; cursor: not-allowed; }

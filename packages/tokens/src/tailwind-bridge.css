@@ -1,0 +1,171 @@
+/* =============================================================================
+   tailwind-bridge — utilities semânticas + base layer + keyframes da marca.
+   -----------------------------------------------------------------------------
+   POR QUE VIVE EM @bela/tokens. Os DOIS apps (deskone e console-bela) montam os
+   mesmos componentes do @bela/ui, que dependem destas classes. Deixar o bloco no
+   globals.css de um app obrigaria o outro a manter uma cópia — e um token de cor
+   novo passaria a exigir edição em dois lugares, com metade das telas ficando
+   para trás. Mesmo raciocínio da unificação da paleta (docs/diario.md 2026-08-08).
+
+   Cada app importa este arquivo DEPOIS de `tailwindcss` e de `tokens.css`, e
+   declara os próprios `@source`/`@custom-variant` (que dependem do caminho do app).
+
+   Utilities via `@utility`, NÃO `@theme`: com `@theme` o Tailwind v4 gerava ZERO
+   classes aqui. Modo escuro funciona porque cada uma resolve `var(--token)` em
+   tempo de execução e os tokens viram sob `.dark`.
+   ========================================================================== */
+
+@layer base {
+  * { border-color: var(--c-border-subtle); }
+  body { background-color: hsl(var(--surface-0)); color: var(--c-text-primary); font-family: var(--font-sans); line-height: var(--line-height-normal); -webkit-font-smoothing: antialiased; }
+}
+
+/* Semantic color utilities via @utility (bug-proof: real utilities, variant-capable,
+   independent of @theme color registration). Dark mode works because each resolves
+   var(--token) at runtime and the tokens flip under .dark. */
+@utility bg-surface-0 { background-color: hsl(var(--surface-0)); }
+@utility text-surface-0 { color: hsl(var(--surface-0)); }
+@utility border-surface-0 { border-color: hsl(var(--surface-0)); }
+@utility bg-surface-1 { background-color: hsl(var(--surface-1)); }
+@utility text-surface-1 { color: hsl(var(--surface-1)); }
+@utility border-surface-1 { border-color: hsl(var(--surface-1)); }
+@utility bg-surface-2 { background-color: hsl(var(--surface-2)); }
+@utility text-surface-2 { color: hsl(var(--surface-2)); }
+@utility border-surface-2 { border-color: hsl(var(--surface-2)); }
+@utility bg-surface-3 { background-color: hsl(var(--surface-3)); }
+@utility text-surface-3 { color: hsl(var(--surface-3)); }
+@utility border-surface-3 { border-color: hsl(var(--surface-3)); }
+@utility bg-text-primary { background-color: var(--c-text-primary); }
+@utility text-text-primary { color: var(--c-text-primary); }
+@utility border-text-primary { border-color: var(--c-text-primary); }
+@utility bg-text-secondary { background-color: var(--c-text-secondary); }
+@utility text-text-secondary { color: var(--c-text-secondary); }
+@utility border-text-secondary { border-color: var(--c-text-secondary); }
+@utility bg-text-muted { background-color: var(--c-text-muted); }
+@utility text-text-muted { color: var(--c-text-muted); }
+@utility border-text-muted { border-color: var(--c-text-muted); }
+@utility bg-text-inverse { background-color: var(--c-text-inverse); }
+@utility text-text-inverse { color: var(--c-text-inverse); }
+@utility border-text-inverse { border-color: var(--c-text-inverse); }
+@utility bg-text-on-accent { background-color: hsl(var(--text-on-accent)); }
+@utility text-text-on-accent { color: hsl(var(--text-on-accent)); }
+@utility border-text-on-accent { border-color: hsl(var(--text-on-accent)); }
+@utility bg-border-subtle { background-color: var(--c-border-subtle); }
+@utility text-border-subtle { color: var(--c-border-subtle); }
+@utility border-border-subtle { border-color: var(--c-border-subtle); }
+/* Régua de TABELA — neutra (ver --border-table em bela-kit.css). */
+@utility border-border-table { border-color: var(--c-border-table); }
+@utility bg-border-default { background-color: var(--c-border-default); }
+@utility text-border-default { color: var(--c-border-default); }
+@utility border-border-default { border-color: var(--c-border-default); }
+@utility bg-border-strong { background-color: var(--c-border-strong); }
+@utility text-border-strong { color: var(--c-border-strong); }
+@utility border-border-strong { border-color: var(--c-border-strong); }
+@utility bg-border-focus { background-color: hsl(var(--border-focus)); }
+@utility text-border-focus { color: hsl(var(--border-focus)); }
+@utility border-border-focus { border-color: hsl(var(--border-focus)); }
+@utility bg-primary { background-color: hsl(var(--primary)); }
+@utility text-primary { color: hsl(var(--primary)); }
+@utility border-primary { border-color: hsl(var(--primary)); }
+@utility bg-primary-hover { background-color: hsl(var(--primary-hover)); }
+@utility text-primary-hover { color: hsl(var(--primary-hover)); }
+@utility border-primary-hover { border-color: hsl(var(--primary-hover)); }
+@utility bg-primary-fg { background-color: hsl(var(--primary-fg)); }
+@utility text-primary-fg { color: hsl(var(--primary-fg)); }
+@utility border-primary-fg { border-color: hsl(var(--primary-fg)); }
+@utility bg-status-critical { background-color: hsl(var(--status-critical)); }
+@utility text-status-critical { color: hsl(var(--status-critical)); }
+@utility border-status-critical { border-color: hsl(var(--status-critical)); }
+@utility bg-status-critical-surface { background-color: hsl(var(--status-critical-surface)); }
+@utility text-status-critical-surface { color: hsl(var(--status-critical-surface)); }
+@utility border-status-critical-surface { border-color: hsl(var(--status-critical-surface)); }
+@utility bg-status-critical-border { background-color: hsl(var(--status-critical-border)); }
+@utility text-status-critical-border { color: hsl(var(--status-critical-border)); }
+@utility border-status-critical-border { border-color: hsl(var(--status-critical-border)); }
+@utility bg-status-critical-fg { background-color: hsl(var(--status-critical-fg)); }
+@utility text-status-critical-fg { color: hsl(var(--status-critical-fg)); }
+@utility border-status-critical-fg { border-color: hsl(var(--status-critical-fg)); }
+@utility bg-status-at-risk { background-color: hsl(var(--status-at-risk)); }
+@utility text-status-at-risk { color: hsl(var(--status-at-risk)); }
+@utility border-status-at-risk { border-color: hsl(var(--status-at-risk)); }
+@utility bg-status-at-risk-surface { background-color: hsl(var(--status-at-risk-surface)); }
+@utility text-status-at-risk-surface { color: hsl(var(--status-at-risk-surface)); }
+@utility border-status-at-risk-surface { border-color: hsl(var(--status-at-risk-surface)); }
+@utility bg-status-at-risk-border { background-color: hsl(var(--status-at-risk-border)); }
+@utility text-status-at-risk-border { color: hsl(var(--status-at-risk-border)); }
+@utility border-status-at-risk-border { border-color: hsl(var(--status-at-risk-border)); }
+@utility bg-status-at-risk-fg { background-color: hsl(var(--status-at-risk-fg)); }
+@utility text-status-at-risk-fg { color: hsl(var(--status-at-risk-fg)); }
+@utility border-status-at-risk-fg { border-color: hsl(var(--status-at-risk-fg)); }
+@utility bg-status-regular { background-color: hsl(var(--status-regular)); }
+@utility text-status-regular { color: hsl(var(--status-regular)); }
+@utility border-status-regular { border-color: hsl(var(--status-regular)); }
+@utility bg-status-regular-surface { background-color: hsl(var(--status-regular-surface)); }
+@utility text-status-regular-surface { color: hsl(var(--status-regular-surface)); }
+@utility border-status-regular-surface { border-color: hsl(var(--status-regular-surface)); }
+@utility bg-status-regular-border { background-color: hsl(var(--status-regular-border)); }
+@utility text-status-regular-border { color: hsl(var(--status-regular-border)); }
+@utility border-status-regular-border { border-color: hsl(var(--status-regular-border)); }
+@utility bg-status-regular-fg { background-color: hsl(var(--status-regular-fg)); }
+@utility text-status-regular-fg { color: hsl(var(--status-regular-fg)); }
+@utility border-status-regular-fg { border-color: hsl(var(--status-regular-fg)); }
+@utility bg-status-on-track { background-color: hsl(var(--status-on-track)); }
+@utility text-status-on-track { color: hsl(var(--status-on-track)); }
+@utility border-status-on-track { border-color: hsl(var(--status-on-track)); }
+@utility bg-status-on-track-surface { background-color: hsl(var(--status-on-track-surface)); }
+@utility text-status-on-track-surface { color: hsl(var(--status-on-track-surface)); }
+@utility border-status-on-track-surface { border-color: hsl(var(--status-on-track-surface)); }
+@utility bg-status-on-track-border { background-color: hsl(var(--status-on-track-border)); }
+@utility text-status-on-track-border { color: hsl(var(--status-on-track-border)); }
+@utility border-status-on-track-border { border-color: hsl(var(--status-on-track-border)); }
+@utility bg-status-on-track-fg { background-color: hsl(var(--status-on-track-fg)); }
+@utility text-status-on-track-fg { color: hsl(var(--status-on-track-fg)); }
+@utility border-status-on-track-fg { border-color: hsl(var(--status-on-track-fg)); }
+@utility bg-accent-bela { background-color: hsl(var(--accent-bela)); }
+@utility text-accent-bela { color: hsl(var(--accent-bela)); }
+@utility border-accent-bela { border-color: hsl(var(--accent-bela)); }
+@utility bg-accent-bela-surface { background-color: hsl(var(--accent-bela-surface)); }
+@utility text-accent-bela-surface { color: hsl(var(--accent-bela-surface)); }
+@utility border-accent-bela-surface { border-color: hsl(var(--accent-bela-surface)); }
+@utility bg-accent-bela-border { background-color: hsl(var(--accent-bela-border)); }
+@utility text-accent-bela-border { color: hsl(var(--accent-bela-border)); }
+@utility border-accent-bela-border { border-color: hsl(var(--accent-bela-border)); }
+@utility bg-accent-bela-fg { background-color: hsl(var(--accent-bela-fg)); }
+@utility text-accent-bela-fg { color: hsl(var(--accent-bela-fg)); }
+@utility border-accent-bela-fg { border-color: hsl(var(--accent-bela-fg)); }
+@utility bg-tag-neutral { background-color: hsl(var(--tag-neutral)); }
+@utility text-tag-neutral { color: hsl(var(--tag-neutral)); }
+@utility border-tag-neutral { border-color: hsl(var(--tag-neutral)); }
+@utility bg-tag-neutral-border { background-color: hsl(var(--tag-neutral-border)); }
+@utility text-tag-neutral-border { color: hsl(var(--tag-neutral-border)); }
+@utility border-tag-neutral-border { border-color: hsl(var(--tag-neutral-border)); }
+@utility bg-tag-neutral-fg { background-color: hsl(var(--tag-neutral-fg)); }
+@utility text-tag-neutral-fg { color: hsl(var(--tag-neutral-fg)); }
+@utility border-tag-neutral-fg { border-color: hsl(var(--tag-neutral-fg)); }
+/* shadcn-style alias used by Button */
+@utility text-primary-foreground { color: hsl(var(--primary-fg)); }
+/* subtle violet tint for BELA widget surfaces */
+@utility bg-accent-bela-bg { background-color: hsl(var(--accent-bela-bg)); }
+
+/* bela brand keyframes — spark pulse (thinking), slow spin (button loading),
+   fade-up (entrances). No bounce, no spring overshoot. */
+@keyframes bela-spark-pulse {
+  0%, 100% { opacity: 1;    transform: scale(1);   }
+  50%      { opacity: 0.72; transform: scale(0.9); }
+}
+@keyframes bela-spin-slow { to { transform: rotate(360deg); } }
+@keyframes bela-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* BELA typing indicator — smooth opacity/lift pulse (ease-out, no bounce/elastic). */
+@keyframes bela-typing {
+  0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+  40%           { opacity: 1;   transform: translateY(-2px); }
+}
+.bela-typing-dot { animation: bela-typing 1.2s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+
+/* Applied on <html> only during a theme switch: token-based colors snap to the
+   new theme instead of freezing mid-transition. */
+.no-theme-transition * { transition: none !important; }

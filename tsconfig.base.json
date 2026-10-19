@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    /* `vite/client` dá o módulo dos imports de asset (`import x from './a.png'`).
+       Precisou virar global em 2026-08-26, quando o retrato da bela (exportado
+       do Figma) entrou como imagem dentro de @bela/ui — antes só os apps
+       declaravam esse tipo, e o pacote de UI não compilava. */
+    "types": ["vite/client"],
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "baseUrl": ".",
+    "paths": {
+      "@bela/tokens": ["packages/tokens/src/index.ts"],
+      "@bela/tokens/*": ["packages/tokens/src/*"],
+      "@bela/types": ["packages/types/src/index.ts"],
+      "@bela/types/*": ["packages/types/src/*"],
+      "@bela/ui": ["packages/ui/src/index.ts"],
+      "@bela/ui/*": ["packages/ui/src/*"]
+    }
+  }
+}

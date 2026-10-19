@@ -1,0 +1,18 @@
+{
+  "name": "leads-e-cio",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Canal de captação de leads do 17º e-CIO (chat da bela + roleta). Recorte do monorepo bela-deskone: o app e só os pacotes do design system que ele usa.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @bela/leads-17-e-cio",
+    "build": "npm run build --workspace @bela/leads-17-e-cio",
+    "estresse": "npm run estresse --workspace @bela/leads-17-e-cio"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

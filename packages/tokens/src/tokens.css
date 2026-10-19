@@ -1,0 +1,515 @@
+/* =============================================================================
+   BELA + DeskOne — Design Tokens  ·  bela brand (by Belago)
+   -----------------------------------------------------------------------------
+   TWO LAYERS. Components consume ONLY the SEMANTIC layer.
+     1. PRIMITIVES  — raw brand values (Bela deck p.09/10). The ONLY place literal
+                      colors/sizes live. Rebrand = edit here.
+     2. SEMANTIC    — named by FUNCTION (surface, text, status-critical, accent-bela).
+                      Never named by appearance (no "purple", no "gray-500").
+   Colors are HSL channels ("H S% L%") so shadcn's hsl(var(--x)) bridge + our
+   @utility color layer resolve them. Non-color tokens (type, space, radius,
+   shadow, motion) are literal, mirroring .claude/skills/bela-design/tokens/*.
+
+   FONTE ÚNICA DE VALOR DE MARCA (desde 2026-08-08). O bloco PRIMITIVES abaixo é
+   o ÚNICO lugar do produto com valor de cor literal. O escopo `.bela-kit`
+   (packages/tokens/src/bela-kit.css), usado pelos componentes de estilo
+   inline, é um ADAPTADOR: deriva todos os primitivos daqui via hsl() e não
+   guarda nenhum hex próprio. Rebrand = editar só este bloco; as duas famílias de
+   tela mudam juntas. Se você adicionar um primitivo aqui e o kit precisar dele,
+   exponha o alias lá — nunca copie o valor.
+   Brand rules that shape these values (see skill readme.md):
+     · Roxo #3E0CF5 is the statement/primary; one Roxo surface per screen.
+     · AI output sits on lavender (--surface-ai = purple-400), never plain white.
+     · Status color lives only in badges; text/surfaces stay neutral.
+     · Generously rounded (flower symbol). BOTÃO é retângulo arredondado
+       (raio sm/md) desde 2026-08-26 — a PÍLULA ficou sendo a forma do BADGE
+       e do chip, e é ela que separa "rótulo" de "clicável".
+   ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------------------
+     1. PRIMITIVES (raw brand — do not consume directly in components)
+     ------------------------------------------------------------------------ */
+
+  /* PRECISÃO (2026-08-08): os tripletos abaixo têm 2 casas decimais porque são a
+     conversão EXATA do hex da marca — cada um faz round-trip de volta ao hex
+     documentado ao lado. Antes estavam arredondados a inteiro, e o Roxo saía
+     #3D0AF5 em vez de #3E0CF5 (erro de 1–2 por canal, imperceptível, mas o
+     produto não renderizava a cor exata da marca). Ao editar, converta do hex
+     com 2 casas — não arredonde. */
+
+  /* Ink / neutral ramp — 900 = Asfalto #171717, 400 = Cinza #9F9F9F,
+     200 = Cinza Claro #D7D7D7 (Bela deck p.09). Pure neutral (0% sat). */
+  --p-neutral-0:   0 0% 100%;    /* #FFFFFF Branco            */
+  --p-neutral-50:  0 0% 96.08%;  /* #F5F5F5                   */
+  --p-neutral-100: 0 0% 92.16%;  /* #EBEBEB                   */
+  --p-neutral-200: 0 0% 84.31%;  /* #D7D7D7 Cinza Claro       */
+  --p-neutral-300: 0 0% 76.86%;  /* #C4C4C4                   */
+  --p-neutral-400: 0 0% 62.35%;  /* #9F9F9F Cinza             */
+  --p-neutral-450: 0 0% 42%;     /* AA-tuned muted (≥4.5:1 on app bg); off-scale — sem hex de marca */
+  --p-neutral-500: 0 0% 45.1%;   /* #737373                   */
+  --p-neutral-600: 0 0% 34.12%;  /* #575757                   */
+  --p-neutral-700: 0 0% 23.92%;  /* #3D3D3D                   */
+  --p-neutral-800: 0 0% 14.9%;   /* #262626                   */
+  --p-neutral-850: 0 0% 12.16%;  /* #1F1F1F — dark card lift  */
+  --p-neutral-900: 0 0% 9.02%;   /* #171717 Asfalto           */
+
+  /* Roxo / purple scale — 500 is the exact brand Roxo #3E0CF5; 300 the light
+     petal tone #B3A2FA sampled from the symbol; 400 the AI lavender #8362F7. */
+  --p-purple-50:  252 88.24% 96.67%;     /* #F2EFFE */
+  --p-purple-100: 252 88.24% 93.33%;     /* #E5DFFD */
+  --p-purple-200: 251.58 87.69% 87.25%;  /* #CDC2FB */
+  /* Hover da superfície SUTIL da marca (chip clicável). 85.2% é o lavanda mais
+     ESCURO que ainda dá AA (4.51:1) para o Roxo do "resolve na hora" que vive
+     dentro do chip — purple-300 seria mais visível mas derrubaria esse texto
+     para 3.67:1. Off-scale por causa desse teto; não é degrau da rampa. */
+  --p-purple-250: 252 88% 85.2%;         /* #C5B8FA */
+  --p-purple-300: 251.59 89.8% 80.78%;   /* #B3A2FA */
+  --p-purple-400: 253.29 90.3% 67.65%;   /* #8362F7 — AI lavender (brand) */
+  --p-purple-450: 253 90% 64%;           /* AA-tuned AI surface (white text ≥4.5:1); off-scale — sem hex de marca */
+  --p-purple-500: 252.88 92.09% 50.39%;  /* #3E0CF5 — Roxo (brand) */
+  --p-purple-600: 252.66 90.87% 42.94%;  /* #340AD1 */
+  --p-purple-700: 252.67 90.96% 34.71%;  /* #2A08A9 */
+  --p-purple-800: 251.9 90.63% 25.1%;    /* #1D067A */
+  --p-purple-900: 252.17 89.61% 15.1%;   /* #120449 */
+
+  /* Cinza arroxeado — #645B86 ("Scorpion" no Figma Bela_By_Belago, medido em
+     2026-08-26). Não é da rampa neutra (0% de saturação) nem da rampa Roxo: é o
+     CINZA DA MARCA no redesenho. Carrega três papéis: texto de apoio
+     (secundário e muted), placeholder de campo e o preenchimento da bolha da
+     própria pessoa no chat de página. Passa AA nas quatro superfícies do
+     produto — branco 6.2:1, fundo #F5F5F5 5.7:1, lavanda do widget 4.8:1,
+     lavanda claro 5.5:1 —, o que o cinza neutro anterior não fazia. */
+  --p-slate-500: 252.56 19.11% 44.12%;     /* #645B86 */
+
+  /* Fundo da TELA — #F7F9FF (user, 2026-08-27). Não é da rampa neutra: tem um
+     azul de fundo, quase imperceptível sozinho, que é o que faz o card branco
+     "acender" por cima em vez de se dissolver no cinza. Só o FUNDO DA PÁGINA
+     usa este primitivo; `--surface-2` e o `--surface-subtle` do kit seguem no
+     cinza neutro (são degraus DENTRO do card, não a base da tela). */
+  --p-app-bg: 225 100% 98.43%;             /* #F7F9FF */
+
+  /* Status hues — bela defines success/warning/danger only (deck); green is the
+     deck's success chip, amber/red derived to match its chroma. -surface = 100,
+     -solid = 500, -fg (text on surface) = 700, -border derived between 100/500.
+     A11y: -solid amber/green on white are <3:1, so never use a bare -solid dot/bar
+     as the SOLE status signifier — always pair with a text label (StatusBadge does)
+     or an outline; the AA-passing -fg carries meaning on the -surface tint. */
+  --p-red-solid:     0 72.22% 50.59%;      /* #DC2626 */
+  --p-red-surface:   0 93.33% 94.12%;      /* #FEE2E2 */
+  --p-red-border:    0 85% 88%;            /* derivado entre surface e solid — sem hex de marca */
+  --p-red-text:      0 70% 35.29%;         /* #991B1B */
+
+  --p-amber-solid:   37.69 92.13% 50.2%;   /* #F59E0B */
+  --p-amber-surface: 48 96.49% 88.82%;     /* #FEF3C7 */
+  --p-amber-border:  44 92% 80%;           /* derivado — sem hex de marca */
+  --p-amber-text:    25.96 90.48% 37.06%;  /* #B45309 */
+
+  --p-green-solid:   142.09 70.56% 45.29%; /* #22C55E */
+  --p-green-surface: 140.62 84.21% 92.55%; /* #DCFCE7 */
+  --p-green-border:  142 60% 82%;          /* derivado — sem hex de marca */
+  --p-green-text:    142.43 71.81% 29.22%; /* #15803D */
+
+  /* Info / "regular" status — bela has no blue in its palette; kept as a derived
+     info tone (like the skill derived amber/red) for the 4th, currently-unused
+     StatusBadge tone. Not a brand color; never used as a surface wash. */
+  --p-blue-solid:    214 90% 52%;
+  --p-blue-surface:  214 100% 96%;
+  --p-blue-border:   214 90% 85%;
+  --p-blue-text:     214 85% 38%;
+
+  /* ---------------------------------------------------------------------------
+     2. SEMANTIC — LIGHT (components consume ONLY these)
+     ------------------------------------------------------------------------ */
+
+  /* Surfaces (elevation ladder, back → front). Product = white page on a
+     --surface-0 (#F5F5F5) app background; cards white. Roxo is NOT a wash. */
+  --surface-0: var(--p-app-bg);       /* app background — #F7F9FF   */
+  --surface-1: var(--p-neutral-0);    /* card / panel               */
+  --surface-2: var(--p-neutral-100);  /* muted / inset / table head */
+  --surface-3: var(--p-neutral-0);    /* popover / drawer / overlay */
+
+  /* Brand surfaces — the Roxo statement. One per screen (hero, primary, active nav). */
+  --surface-brand:        var(--p-purple-500);
+  --surface-brand-hover:  var(--p-purple-600);
+  --surface-brand-active: var(--p-purple-700);
+  --surface-brand-subtle: var(--p-purple-50);   /* accent / ghost-hover tint */
+  /* O hover do chip NÃO pode ser --surface-brand-soft: essa é a cor da faixa
+     lavanda onde o chip mora, e o realce sumia dentro do fundo (achado do user,
+     2026-08-27). */
+  --surface-brand-subtle-hover: var(--p-purple-250);
+  --surface-brand-soft:   var(--p-purple-100);
+  --text-brand:           var(--p-purple-500);
+  --border-brand:         var(--p-purple-500);
+
+  /* AI surface — lavender fill for bela-generated output (AISuggestion / "bela
+     Orienta"). Never the same white as user content: that contrast is the signal. */
+  --surface-ai:    var(--p-purple-450);
+  --surface-ai-fg: var(--p-neutral-0);
+
+  /* Bolha da PRÓPRIA pessoa no chat (Figma 26/08). Duas intensidades porque a
+     conversa aparece em dois contextos diferentes: dentro de uma página, onde
+     divide a tela com o resto do conteúdo e o Roxo pleno gritaria; e no drawer,
+     onde a conversa é a única coisa na superfície e pode assumir a marca.
+     A fala da bela NÃO usa estes tokens — ela mora em --surface-brand-subtle. */
+  --surface-bubble-self:       var(--p-slate-500);   /* chat na página (4.a)  */
+  --surface-bubble-self-focus: var(--p-purple-500);  /* drawer / overlay      */
+  --surface-bubble-self-fg:    var(--p-neutral-0);
+
+  /* CROMA DO CINZA (Figma Bela_By_Belago, medido 2026-08-26 nos nós 277:1745 e
+     277:1685). O redesenho NÃO usa cinza neutro no texto de apoio nem nas
+     bordas: usa o roxo acinzentado #645B86 e o lavanda #E5DFFD. É o que fazia a
+     mesma tela parecer "de outra marca" mesmo com o layout certo — o produto
+     inteiro é lavado de roxo, não só os widgets da bela.
+     Bônus de a11y: #645B86 passa AA nas QUATRO superfícies do produto (branco
+     6.2:1, fundo #F5F5F5 5.7:1, lavanda do widget 4.8:1, lavanda claro 5.5:1).
+     O cinza que estava aqui reprovava sobre o lavanda do widget (4.14:1), então
+     as duas variantes `-on-brand` deixaram de precisar de valor próprio. */
+  /* Text */
+  --text-primary:   var(--p-neutral-900);  /* Asfalto */
+  --text-secondary: var(--p-slate-500);    /* #645B86 — ver nota do croma */
+  /* Secundário/muted SOBRE superfícies lavanda/brand (cards accent-bela). No
+     claro o cinza serve; no escuro viram lavanda — cinza sobre roxo lê "sujo"
+     (gray-on-color, varredura Fase 7). Gêmeos dos tokens do bela-kit.css. */
+  --text-secondary-on-brand: var(--p-slate-500);
+  --text-muted-on-brand: var(--p-slate-500);
+  --text-muted:     var(--p-slate-500);    /* #645B86 — ver nota do croma */
+  --text-inverse:   var(--p-neutral-0);
+  --text-on-accent: var(--p-neutral-0);
+  --text-on-brand:  var(--p-neutral-0);
+
+  /* Borders — hairlines. */
+  --border-subtle:  var(--p-purple-100);   /* #E5DFFD — ver nota do croma */
+
+  /* PONTE das utilities do Tailwind (bridge) — 2026-08-25.
+     Os utilitários de cor fazem `hsl(var(--token))`, o que exige o token em
+     COMPONENTES. Dentro de `.bela-kit` os mesmos nomes são redefinidos como
+     COR COMPLETA (os componentes Kit* usam `var(--token)` direto) — ali o
+     `hsl(hsl(…))` fica inválido e a cor cai em currentColor (borda/texto
+     PRETOS). Estes `--c-*` existem nos DOIS escopos já no formato final de
+     cor, e são o que o bridge consome. Sem eles, misturar classe Tailwind
+     com Kit* na mesma tela quebra silenciosamente. */
+  --c-border-default: hsl(var(--border-default));
+  --c-border-strong: hsl(var(--border-strong));
+  --c-border-subtle: hsl(var(--border-subtle));
+  --c-text-inverse: hsl(var(--text-inverse));
+  --c-text-muted: hsl(var(--text-muted));
+  --c-text-primary: hsl(var(--text-primary));
+  --c-text-secondary: hsl(var(--text-secondary));
+  --border-default: var(--p-purple-100);   /* #E5DFFD — ver nota do croma */
+  --border-strong:  var(--p-neutral-400);  /* #9F9F9F */
+  --border-focus:   var(--p-purple-500);   /* Roxo focus ring */
+
+  /* Interactive / primary — now the brand Roxo (was wireframe near-black). */
+  --primary:       var(--p-purple-500);
+  --primary-hover: var(--p-purple-600);
+  --primary-fg:    var(--p-neutral-0);
+
+  /* Status — number/status half of the "number + explanation" pattern (CLAUDE.md §2).
+     Each has: -solid (dot/bar/text), -surface (badge bg), -border, -fg (text on surface). */
+  --status-critical:         var(--p-red-solid);
+  --status-critical-surface: var(--p-red-surface);
+  --status-critical-border:  var(--p-red-border);
+  --status-critical-fg:      var(--p-red-text);
+
+  --status-at-risk:          var(--p-amber-solid);
+  --status-at-risk-surface:  var(--p-amber-surface);
+  --status-at-risk-border:   var(--p-amber-border);
+  --status-at-risk-fg:       var(--p-amber-text);
+
+  --status-regular:          var(--p-blue-solid);
+  --status-regular-surface:  var(--p-blue-surface);
+  --status-regular-border:   var(--p-blue-border);
+  --status-regular-fg:       var(--p-blue-text);
+
+  --status-on-track:         var(--p-green-solid);
+  --status-on-track-surface: var(--p-green-surface);
+  --status-on-track-border:  var(--p-green-border);
+  --status-on-track-fg:      var(--p-green-text);
+
+  /* BELA accent — the "IA" tag / enrichment / confidence chrome (Roxo family).
+     Presence of this color = something is BELA-generated (module or hybrid layer). */
+  --accent-bela:         var(--p-purple-500);
+  --accent-bela-surface: var(--p-purple-50);
+  --accent-bela-border:  var(--p-purple-200);
+  --accent-bela-fg:      var(--p-purple-700);
+  --accent-bela-bg:      var(--p-purple-50);   /* subtle card/panel tint */
+
+  /* Neutral tag — the ITSM-native / session counterpart to the BELA tag.
+     Presence of THIS (not Roxo) = pure ITSM-native data. */
+  --tag-neutral:         var(--p-neutral-100);
+  --tag-neutral-border:  var(--p-neutral-300);
+  --tag-neutral-fg:      var(--p-neutral-600);
+
+  /* ---------------------------------------------------------------------------
+     TYPOGRAPHY  —  Red Hat Display (brand), Red Hat Mono for IDs/SLAs/timestamps.
+     Display & headings are always Bold (700) with negative tracking — that
+     tightness is the brand's voice; never set headlines at Regular.
+     ------------------------------------------------------------------------ */
+  --font-sans:    "Red Hat Display", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: var(--font-sans);
+  --font-body:    var(--font-sans);
+  --font-mono:    "Red Hat Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Weights — QUATRO, e só quatro. No TSX o caminho canônico é `WEIGHT`
+     (packages/ui/src/bela-kit); estes tokens são a fonte dos valores.
+     Light (300) e ExtraBold (800) saíram em 2026-09-11: nenhum componente os
+     consumia e a existência deles convidava exceções de peso tela a tela. */
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+  /* Nomenclatura legada — ALIAS, não valores paralelos. Não usar em código novo. */
+  --font-weight-regular:  var(--weight-regular);
+  --font-weight-medium:   var(--weight-medium);
+  --font-weight-semibold: var(--weight-semibold);
+  --font-weight-bold:     var(--weight-bold);
+
+  /* Escala legada em rem — ALIAS da escala de marca abaixo. Não usar em código novo.
+     Até 2026-09-11 estas eram uma SEGUNDA escala com valores próprios, e o mesmo
+     papel saía em dois tamanhos na mesma tela: o timestamp do Thread a 12px
+     (--font-size-xs) ao lado da legenda do DetalheTicket a 13px (--caption-size).
+     É a origem do "parecem fontes diferentes" reportado no chamado #5002. */
+  --font-size-xs:  var(--caption-size);    /* 12px → 13px */
+  --font-size-sm:  var(--body-sm-size);    /* 14px (inalterado) */
+  --font-size-md:  var(--body-md-size);    /* 16px (inalterado) */
+  --font-size-lg:  var(--body-lg-size);    /* 18px (inalterado) */
+  --font-size-xl:  var(--heading-sm-size); /* 20px → 19px */
+  --font-size-2xl: var(--heading-md-size); /* 24px (inalterado) */
+  --font-size-3xl: var(--heading-lg-size); /* 30px → 32px */
+
+  /* Brand type scale (bela) — display/heading carry negative tracking. */
+  --display-xl-size: 72px; --display-xl-line: 1.02; --display-xl-tracking: -0.028em;
+  --display-lg-size: 56px; --display-lg-line: 1.05; --display-lg-tracking: -0.026em;
+  --display-md-size: 44px; --display-md-line: 1.08; --display-md-tracking: -0.024em;
+  --heading-lg-size: 32px; --heading-lg-line: 1.15; --heading-lg-tracking: -0.02em;
+  --heading-md-size: 24px; --heading-md-line: 1.2;  --heading-md-tracking: -0.016em;
+  --heading-sm-size: 19px; --heading-sm-line: 1.3;  --heading-sm-tracking: -0.012em;
+  --body-lg-size: 18px;    --body-lg-line: 1.55;    --body-lg-tracking: -0.004em;
+  --body-md-size: 16px;    --body-md-line: 1.55;    --body-md-tracking: 0em;
+  --body-sm-size: 14px;    --body-sm-line: 1.5;     --body-sm-tracking: 0em;
+  --caption-size: 13px;    --caption-line: 1.45;    --caption-tracking: 0.002em;
+  --eyebrow-size: 12px;    --eyebrow-line: 1.2;     --eyebrow-tracking: 0.22em; /* uppercase micro-label */
+  --mono-size: 12px;       --mono-line: 1.4;        --mono-tracking: 0.02em;
+
+  /* Tracking de controles (botão, input, badge, chip, aba, iniciais de avatar).
+     Criado em 2026-09-11 para absorver as quatro variantes soltas que existiam
+     no bela-kit (-0.004 / -0.006 / -0.008 / -0.01em). A diferença máxima entre
+     elas era 0.006em ≈ 0.1px a 16px — invisível, mas cada tela escolhia a sua. */
+  --control-tracking: -0.006em;
+
+  --line-height-tight:  1.2;
+  --line-height-normal: 1.5;
+  --line-height-loose:  1.7;
+
+  /* ---------------------------------------------------------------------------
+     SPACING  (4px base ramp)
+     ------------------------------------------------------------------------ */
+  /* Product scale (kept — current components consume these) */
+  --space-3xs: 0.125rem; /* 2  */
+  --space-2xs: 0.25rem;  /* 4  */
+  --space-xs:  0.5rem;   /* 8  */
+  --space-sm:  0.75rem;  /* 12 */
+  --space-md:  1rem;     /* 16 */
+  --space-lg:  1.5rem;   /* 24 */
+  --space-xl:  2rem;     /* 32 */
+  --space-2xl: 3rem;     /* 48 */
+  --space-3xl: 4rem;     /* 64 */
+  --space-cell-x: var(--space-sm); /* table cell padding X */
+  --space-cell-y: var(--space-xs); /* table cell padding Y (compact density) */
+
+  /* Numeric px scale (bela) — used by ported brand components */
+  --space-0: 0px;   --space-1: 4px;   --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px;  --space-5: 20px;  --space-6: 24px;  --space-8: 32px;
+  --space-10: 40px; --space-12: 48px; --space-16: 64px; --space-20: 80px;
+  --space-24: 96px; --space-32: 128px;
+
+  /* Layout */
+  /* CONTAINER FLUIDO (Figma Bela_By_Belago, 2026-08-26). Era 1280px centralizado.
+     Os 8 frames do redesenho não centralizam nada: o conteúdo ocupa a janela
+     inteira e o respiro vem só do gutter — em 1920px isso dá 1604px de conteúdo
+     contra os 1200 de antes. Quem quiser limitar a largura de TEXTO CORRIDO usa
+     --measure-prose; largura de PÁGINA não é mais o instrumento disso.
+     O valor `none` é consumido por KitPage; nenhuma tela decide isso sozinha. */
+  --container-max:     none;
+  --gutter-page:       var(--space-10);  /* 40px — era --space-8 (32px) */
+  --gutter-page-lg:    var(--space-16);
+  --control-height-sm: 32px;
+  --control-height-md: 40px;
+  --control-height-lg: 48px;
+  --touch-target-min:  44px;
+  /* Medida de leitura (largura máxima de TEXTO CORRIDO — subtítulo de página,
+     descrição de seção, parágrafo de artigo). Linha longa demais faz o olho
+     perder o ponto de retorno; a faixa confortável é 65–75 caracteres. Não vale
+     para tabela, KPI ou rótulo de controle — lá a largura é da coluna, não do
+     texto. Calibrado em 2026-08-17: o container de 1200px rendia ~126 chars/linha.
+     O valor é 60ch e não 68ch porque o "0" desta fonte mede ~0,66em: 68ch dava
+     630px = ~90 chars/linha reais. 60ch ≈ 556px ≈ 79 chars — dentro da faixa. */
+  --measure-prose:     60ch;
+
+  /* ---------------------------------------------------------------------------
+     RADIUS  —  bela leans generously rounded. Controls sm/pill, cards lg (20px),
+     hero/marketing panels 2xl (40px). Buttons are always pill.
+     ------------------------------------------------------------------------ */
+  --radius-xs:   6px;
+  --radius-sm:   10px;   /* inputs, small controls */
+  --radius-md:   14px;
+  --radius-lg:   20px;   /* cards, panels          */
+  --radius-xl:   28px;
+  --radius-2xl:  40px;   /* hero / marketing panels */
+  /* Card a 14px (= md) desde 2026-08-26: `radius/lg` não aparece em nenhum dos
+     8 frames do Figma Bela_By_Belago — todo card de lá usa `radius/md`. O 20px
+     segue existindo como --radius-lg para painel/hero; só o CARD desceu. */
+  --radius-card: 14px;   /* cards (= md)           */
+  /* Chip clicável (pílula de AÇÃO) — 8px, medida dada pelo user em 2026-08-27.
+     Fica ENTRE xs (6) e sm (10) e por isso ganha nome próprio em vez de entrar
+     na escala: é a forma de um elemento específico, não um degrau novo. */
+  --radius-chip: 8px;
+  /* CAMPO (Figma, medidas dadas pelo user em 2026-08-27): o campo GRANDE de
+     conversar com a bela usa 12; busca e select, 8 — o mesmo canto do chip.
+     Nenhum dos dois é degrau da escala (sm 10 / md 14): são a forma de dois
+     controles específicos, por isso nome próprio. */
+  --radius-field: 12px;
+  --radius-control: 8px;
+
+  /* ÍCONE — espessura de traço. Medida no Figma (nó 277:2837, exportado):
+     `stroke-width: 1.41667` num viewBox de 21.4167, que é o mesmo espaço do
+     lucide (24) recortado no bounding box. Arredondado para 1.5, o passo que o
+     lucide desenha bem. O padrão do lucide é 2 — mais pesado que a marca. */
+  --icon-stroke: 1.5;
+  /* Glifo dentro do quadradinho de 48: o Figma recorta o ícone no bounding box
+     e o põe a 20px, então a TINTA ocupa os 20px inteiros. O lucide tem folga no
+     viewBox, então precisa de 22 para a tinta dar os mesmos ~20. */
+  --icon-glyph-md: 22px;
+  --icon-glyph-sm: 18px;
+  --radius-pill: 999px;  /* badges, tags, chips — NÃO botões (ver regra acima) */
+  --radius-full: 9999px; /* avatars, dots          */
+
+  /* ---------------------------------------------------------------------------
+     ELEVATION  —  soft, low-contrast, neutral. One Roxo-tinted glow (--shadow-brand)
+     reserved for AI surfaces and the app-icon treatment.
+     ------------------------------------------------------------------------ */
+  --shadow-xs: 0 1px 2px hsl(var(--p-neutral-900) / 0.06);
+  --shadow-sm: 0 2px 8px hsl(var(--p-neutral-900) / 0.06);
+  --shadow-md: 0 6px 20px hsl(var(--p-neutral-900) / 0.08);
+  --shadow-lg: 0 18px 48px hsl(var(--p-neutral-900) / 0.10);
+  --shadow-brand: 0 12px 32px hsl(var(--p-purple-500) / 0.26);
+  --shadow-inset-hairline: inset 0 0 0 1px hsl(var(--border-subtle));
+  --blur-glass: saturate(1.4) blur(18px);
+  /* Elevation aliases (existing naming — kept so current components don't break) */
+  --elevation-0: none;
+  --elevation-1: var(--shadow-xs);
+  --elevation-2: var(--shadow-sm);
+  --elevation-3: var(--shadow-lg);
+
+  /* ---------------------------------------------------------------------------
+     MOTION  —  one move, cleanly. No bounce, no spring overshoot.
+     ------------------------------------------------------------------------ */
+  --duration-instant: 90ms;
+  --duration-fast:    140ms;
+  --duration-base:    200ms;
+  --duration-slow:    320ms;
+  --duration-slower:  520ms;
+  --ease-out:    cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  --transition-control:
+    background-color var(--duration-fast) var(--ease-out),
+    color            var(--duration-fast) var(--ease-out),
+    border-color     var(--duration-fast) var(--ease-out),
+    box-shadow       var(--duration-fast) var(--ease-out),
+    transform        var(--duration-fast) var(--ease-out);
+}
+
+/* =============================================================================
+   SEMANTIC — DARK  (override the semantic layer only; primitives are reused).
+   Built on Asfalto — the *secondary* mode. Page = #171717, card = #1F1F1F.
+   ========================================================================== */
+.dark {
+  --surface-0: var(--p-neutral-900);  /* Asfalto page */
+  --surface-1: var(--p-neutral-850);  /* #1F1F1F card */
+  --surface-2: var(--p-neutral-800);  /* #262626      */
+  --surface-3: var(--p-neutral-850);
+
+  --surface-brand:        var(--p-purple-500);
+  --surface-brand-hover:  var(--p-purple-400);
+  --surface-brand-active: var(--p-purple-300);
+  --surface-brand-subtle: 253 92% 50% / 0.18;
+  --surface-brand-subtle-hover: 253 92% 50% / 0.34;
+  --surface-brand-soft:   253 92% 50% / 0.28;
+  --text-brand:           var(--p-purple-300);
+  --border-brand:         var(--p-purple-400);
+
+  --surface-ai:    var(--p-purple-450);
+  --surface-ai-fg: var(--p-neutral-0);
+
+  /* Bolha própria: os dois tons já são mais claros que o Asfalto da página, então
+     seguem valendo no escuro — só o texto por cima é que continua branco. */
+  --surface-bubble-self:       var(--p-slate-500);
+  --surface-bubble-self-focus: var(--p-purple-500);
+  --surface-bubble-self-fg:    var(--p-neutral-0);
+
+  --text-primary:   var(--p-neutral-0);
+  --text-secondary: var(--p-neutral-300);
+  --text-secondary-on-brand: var(--p-purple-200);
+  --text-muted-on-brand: var(--p-purple-300);
+  --text-muted:     var(--p-neutral-400);  /* on dark surfaces ink-400 ≈ 7:1, still dimmer than secondary */
+  --text-inverse:   var(--p-neutral-900);
+  --text-on-accent: var(--p-neutral-0);
+  --text-on-brand:  var(--p-neutral-0);
+
+  --border-subtle:  0 0% 100% / 0.08;
+  --border-default: 0 0% 100% / 0.16;
+  --border-strong:  0 0% 100% / 0.32;
+  --border-focus:   var(--p-purple-400);
+
+  --primary:       var(--p-purple-500);
+  --primary-hover: var(--p-purple-400);
+  --primary-fg:    var(--p-neutral-0);
+
+  /* Status: lift surfaces to low-alpha tints so they read on dark backgrounds */
+  --status-critical:         var(--p-red-solid);
+  --status-critical-surface: 0 72% 51% / 0.16;
+  --status-critical-border:  0 72% 51% / 0.35;
+  --status-critical-fg:      0 80% 75%;
+
+  --status-at-risk:          var(--p-amber-solid);
+  --status-at-risk-surface:  38 92% 50% / 0.16;
+  --status-at-risk-border:   38 92% 50% / 0.35;
+  --status-at-risk-fg:       38 95% 70%;
+
+  --status-regular:          var(--p-blue-solid);
+  --status-regular-surface:  214 90% 52% / 0.16;
+  --status-regular-border:   214 90% 52% / 0.35;
+  --status-regular-fg:       214 95% 78%;
+
+  --status-on-track:         var(--p-green-solid);
+  --status-on-track-surface: 142 71% 45% / 0.16;
+  --status-on-track-border:  142 71% 45% / 0.35;
+  --status-on-track-fg:      142 65% 65%;
+
+  --accent-bela:         var(--p-purple-400);
+  --accent-bela-surface: 253 92% 50% / 0.18;
+  --accent-bela-border:  253 90% 68% / 0.40;
+  --accent-bela-fg:      var(--p-purple-300);
+  --accent-bela-bg:      252 60% 13%;   /* subtle Roxo-tinted dark surface */
+
+  --tag-neutral:        var(--p-neutral-800);
+  --tag-neutral-border: var(--p-neutral-600);
+  --tag-neutral-fg:     var(--p-neutral-300);
+
+  --shadow-xs: 0 1px 2px hsl(0 0% 0% / 0.30);
+  --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.36);
+  --shadow-md: 0 6px 20px hsl(0 0% 0% / 0.44);
+  --shadow-lg: 0 18px 48px hsl(0 0% 0% / 0.55);
+  --shadow-brand: 0 12px 32px hsl(var(--p-purple-500) / 0.40);
+}
+
+/* Dentro de um card BELA (superfície roxa) no ESCURO, o texto secundário herda
+   a variante para superfície brand — cinza sobre roxo lê "sujo" (gray-on-color,
+   varredura Fase 7). Espelho, no lado Tailwind, do que o KitCard brandSoft faz
+   por CSS var inline no bela-kit. */
+.dark .bg-accent-bela-bg {
+  --text-secondary: var(--text-secondary-on-brand);
+  --text-muted: var(--text-muted-on-brand);
+}

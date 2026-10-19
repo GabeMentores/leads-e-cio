@@ -1,0 +1,13 @@
+{
+  "name": "@bela/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Semantic design tokens — bela brand primitives (since 2026-08-08). Swap primitives to rebrand — components never change.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./src/tokens.css",
+    "./bela-kit.css": "./src/bela-kit.css"
+  }
+}

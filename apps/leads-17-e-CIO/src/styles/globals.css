@@ -1,0 +1,35 @@
+/* Mesma pilha dos outros apps (deskone/console): fonte empacotada local,
+   tokens unificados e o adaptador do bela-kit. @import primeiro, sempre. */
+@import "../../../../packages/tokens/src/fonts.css";
+@import "tailwindcss";
+@import "../../../../packages/tokens/src/tokens.css";
+@import "../../../../packages/tokens/src/bela-kit.css";
+@import "../../../../packages/tokens/src/tailwind-bridge.css";
+@source "../../../../packages/ui/src/**/*.{ts,tsx}";
+@custom-variant dark (&:is(.dark *));
+
+/* Canal mobile: a página é a conversa — sem scroll do documento, o miolo de
+   mensagens rola sozinho e o composer fica sempre à vista. */
+html, body, #root { height: 100%; }
+/* O main.tsx põe `.bela-kit` no body. O chão do canal é o fundo do APP
+   (--surface-0 = #F7F9FF, o mesmo do drawer da referência) — o --surface-page
+   do kit é BRANCO e sumia com a faixa/divider do cabeçalho. */
+body { margin: 0; overscroll-behavior-y: none; background: hsl(var(--surface-0)); }
+
+/* MARCA DO CANAL = BELAGO (user, 09-15): azul #004CAB do logo oficial
+   ("Belago - Logo Azul.svg" — marca e wordmark na mesma cor). O rebrand é SÓ
+   deste app: re-apontamos os primitivos roxos que o bela-kit consome — todos
+   os tokens semânticos (bolha, composer, botão, chip, grifo, foco) viram azul
+   de uma vez, sem tocar nenhum componente. É exatamente a troca de marca que
+   a camada de tokens existe para permitir. Rampa por PAPEL: */
+.bela-kit {
+  --purple-50:  #EAF2FB;  /* bolha de resposta · cartão do código · soft     */
+  --purple-100: #D9E6F8;  /* painel do composer                              */
+  --purple-200: #AECBF0;  /* contorno das pills de resposta rápida           */
+  --purple-250: #C3D8F4;  /* hover do subtle                                 */
+  --purple-300: #6FA3E8;
+  --purple-500: #004CAB;  /* azul Belago — bolha própria, botão, grifo, foco */
+  --purple-600: #003E8C;  /* hover · seta de enviar                          */
+  --purple-700: #003070;  /* active · ênfase forte                           */
+  --p-purple-500: 213 100% 34%; /* trio HSL do azul (focus-ring e véus)      */
+}
